@@ -24,6 +24,7 @@ from NREL5MWDefaultParameter_SLOW import NREL5MWDefaultParameter_SLOW
 from NREL5MWDefaultParameter_FBNREL import NREL5MWDefaultParameter_FBNREL
 from FBController import FBController, reset_FBController
 from LDP_v3 import LDP_v3, reset_LDP_v3
+from LDP_MD import LDP_MD
 from SLOW import SLOW
 from rpm2radPs import rpm2radPs
 from radPs2rpm import radPs2rpm
@@ -58,6 +59,25 @@ LDP = {
 IndexGate           = 0                         # [-]           MATLAB IndexGate = 1
 GradientStaticPitch = np.deg2rad(1)             # [rad/(m/s)]   Gradient in static pitch curve
 reset_LDP_v3()
+
+# multi-distance LDP (PhotonConfetti), see studies/MultiDistanceLDP
+LDP_MD_Parameter = {
+    'NumberOfBeams':        4,                                          # [-]       number of beams
+    'AngleToCenterline':    19.176,                                     # [deg]     angle of the beams to the centerline
+    'GateDistances':        [50, 65, 80, 100, 115, 130, 145, 160, 175, 200],  # [m] gate distances along x from lidar
+    'X_Lidar':              -3.1,                                       # [m]       lidar position relative to rotor (behind)
+    'RotorDiameter':        126.0,                                      # [m]       rotor diameter
+    'InductionFactor':      0.093,                                      # [-]       induction zone model (fit s03)
+    'c_conv':               1.0,                                        # [-]       advection speed / U_inf (s04)
+    'T_mean':               30.0,                                       # [s]       time constant of U_inf estimate (s09-s11)
+    'U_init':               18.0,                                       # [m/s]     initial value
+    'BufferSize':           64,                                         # [-]       measurements per beam and gate in flight
+    'Weights':              [0.315, 0.050, 0.212, 0.064, 0.215, 0.056, 0.037, 0.049, 0.003, 0.0],  # [-] per gate (s05)
+    'T_lead':               1.75,                                       # [s]       preview for control (s08)
+    'FlagLPF':              1,                                          # [0/1]     adaptive low-pass
+    'k_cutoff':             0.05,                                       # [rad/m]   omega_c = k_cutoff * U_inf (s08)
+}
+ldp = LDP_MD(LDP_MD_Parameter)
 
 # simulation feedback only (should not be changed)
 # allocation and initialization
@@ -111,8 +131,8 @@ for i_t in range(n_t - 1):
     # First discipline (Preview Quality): Provide v_0L[i_t] only based on current (i_t) or past lidar signals: isValid, beamID, lineOfSightWindSpeed
     # Second discipline (Load Reduction): Provide u_ThisStep only based on current (i_t) or past lidar signals and turbine signals from y_ThisStep
 
-    # simple lidar data processing
-    v_0L[i_t]           = LDP_v3(isValid[i_t, IndexGate], beamID[i_t], lineOfSightWindSpeed[i_t, IndexGate], dt, LDP)
+    # multi-distance lidar data processing (baseline: LDP_v3 with gate IndexGate only)
+    v_0L[i_t]           = ldp.step(isValid[i_t, :], beamID[i_t], lineOfSightWindSpeed[i_t, :], dt)
 
     # calculate combined feedback-feedforward controller
     WindAcceleration    = (v_0L[i_t] - v_0L[max(i_t - 1, 0)]) / dt

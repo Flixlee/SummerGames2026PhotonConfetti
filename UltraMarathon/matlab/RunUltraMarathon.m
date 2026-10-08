@@ -38,6 +38,23 @@ IndexGate               = 1;                            % [-]           IndexGat
 GradientStaticPitch     = deg2rad(1);                   % [rad/(m/s)]   Gradient in static pitch curve for feedforward controller
 clear  LDP_v3
 
+% multi-distance LDP (PhotonConfetti), see python/studies/MultiDistanceLDP
+LDP_MD_Parameter.NumberOfBeams      = 4;                                        % [-]       number of beams
+LDP_MD_Parameter.AngleToCenterline  = 19.176;                                   % [deg]     angle of the beams to the centerline
+LDP_MD_Parameter.GateDistances      = [50 65 80 100 115 130 145 160 175 200];   % [m]       gate distances along x from lidar
+LDP_MD_Parameter.X_Lidar            = -3.1;                                     % [m]       lidar position relative to rotor (behind)
+LDP_MD_Parameter.RotorDiameter      = 126;                                      % [m]       rotor diameter
+LDP_MD_Parameter.InductionFactor    = 0.093;                                    % [-]       induction zone model (fit s03)
+LDP_MD_Parameter.c_conv             = 1.0;                                      % [-]       advection speed / U_inf (s04)
+LDP_MD_Parameter.T_mean             = 30;                                       % [s]       time constant of U_inf estimate (s09-s11)
+LDP_MD_Parameter.U_init             = 18;                                       % [m/s]     initial value
+LDP_MD_Parameter.BufferSize         = 64;                                       % [-]       measurements per beam and gate in flight
+LDP_MD_Parameter.Weights            = [0.315 0.050 0.212 0.064 0.215 0.056 0.037 0.049 0.003 0.0]; % [-] per gate (s05)
+LDP_MD_Parameter.T_lead             = 1.75;                                     % [s]       preview for control (s08)
+LDP_MD_Parameter.FlagLPF            = 1;                                        % [0/1]     adaptive low-pass
+LDP_MD_Parameter.k_cutoff           = 0.05;                                     % [rad/m]   omega_c = k_cutoff * U_inf (s08)
+clear  LDP_MD
+
 %% simulation feedback only (should not be changed)
 
 % allocation and initialization
@@ -94,8 +111,8 @@ for i_t=1:n_t-1
     % First discipline (Preview Quality): Provide v_0L(i_t)  only based on current (i_t) or past lidar signals: isValid, beamID, lineOfSightWindSpeed
     % Second discipline (Load Reduction): Provide u_ThisStep only based on current (i_t) or past lidar signals and turbine signals from y_ThisStep
 
-    % simple lidar data processing
-    v_0L(i_t)               = LDP_v3(isValid(i_t,IndexGate),beamID(i_t),lineOfSightWindSpeed(i_t,IndexGate),dt,LDP);
+    % multi-distance lidar data processing (baseline: LDP_v3 with gate IndexGate only)
+    v_0L(i_t)               = LDP_MD(isValid(i_t,:),beamID(i_t),lineOfSightWindSpeed(i_t,:),dt,LDP_MD_Parameter);
 
     % calculate combined feedback-feedforward controller
     WindAcceleration        = (v_0L(i_t)-v_0L(max(i_t-1,1)))/dt;
