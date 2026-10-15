@@ -68,16 +68,22 @@ LDP_MD_Parameter = {
     'X_Lidar':              -3.1,                                       # [m]       lidar position relative to rotor (behind)
     'RotorDiameter':        126.0,                                      # [m]       rotor diameter
     'InductionFactor':      0.093,                                      # [-]       induction zone model (fit s03)
-    'c_conv':               1.0,                                        # [-]       advection speed / U_inf (s04)
-    'T_mean':               30.0,                                       # [s]       time constant of U_inf estimate (s09-s11)
+    'HubHeight':            100.0,                                      # [m]       hub height (assumption) for the shear profile
+    'Z_Lidar':              4.1,                                        # [m]       lidar height above hub
+    'AngleVertical':        12.5,                                       # [deg]     vertical half opening angle of the beams
+    'BeamSignZ':            [1, 1, -1, -1],                             # [-]       beams 1, 2 top; 3, 4 bottom
+    'ShearExponent':        0.093,                                      # [-]       power law for advection over height (s14)
+    'c_conv':               1.0,                                        # [-]       advection speed / U_adv (s04)
+    'T_mean':               0.0,                                        # [s]       advection speed: spatial mean only, no time filter (s14)
+    'T_mean_LPF':           30.0,                                       # [s]       speed for the low-pass corner frequency (s14)
     'U_init':               18.0,                                       # [m/s]     initial value
     'BufferSize':           64,                                         # [-]       measurements per beam and gate in flight
     'Weights':              [0.315, 0.050, 0.212, 0.064, 0.215, 0.056, 0.037, 0.049, 0.003, 0.0],  # [-] per gate (s05)
-    'T_lead':               1.75,                                       # [s]       preview for control (s08)
-    'FlagLPF':              1,                                          # [0/1]     adaptive low-pass
-    'k_cutoff':             0.05,                                       # [rad/m]   omega_c = k_cutoff * U_inf (s08)
+    'T_lead':               2.0,                                        # [s]       preview of the control output (s14)
+    'k_cutoff':             0.05,                                       # [rad/m]   omega_c = k_cutoff * U_LPF (s08)
 }
-ldp = LDP_MD(LDP_MD_Parameter)
+ldp     = LDP_MD(LDP_MD_Parameter)
+v_FF    = np.full(n_t, np.nan)                          # [m/s]         control output of LDP_MD (preview + low-pass)
 
 # simulation feedback only (should not be changed)
 # allocation and initialization
@@ -132,10 +138,11 @@ for i_t in range(n_t - 1):
     # Second discipline (Load Reduction): Provide u_ThisStep only based on current (i_t) or past lidar signals and turbine signals from y_ThisStep
 
     # multi-distance lidar data processing (baseline: LDP_v3 with gate IndexGate only)
-    v_0L[i_t]           = ldp.step(isValid[i_t, :], beamID[i_t], lineOfSightWindSpeed[i_t, :], dt)
+    # v_0L: rotor-effective wind speed now (discipline 1), v_FF: with preview and low-pass (discipline 2)
+    v_0L[i_t], v_FF[i_t] = ldp.step(isValid[i_t, :], beamID[i_t], lineOfSightWindSpeed[i_t, :], dt)
 
     # calculate combined feedback-feedforward controller
-    WindAcceleration    = (v_0L[i_t] - v_0L[max(i_t - 1, 0)]) / dt
+    WindAcceleration    = (v_FF[i_t] - v_FF[max(i_t - 1, 0)]) / dt
     u_FF_ThisStep       = WindAcceleration * GradientStaticPitch  # simple collective pitch feedforward controller
     y_ThisStep          = y_LA[i_t, :]
     u_ThisStep          = FBController(y_ThisStep, u_FF_ThisStep, dt, Parameter)
@@ -168,6 +175,7 @@ plt.figure(figsize=(10, 10))
 plt.subplot(511)
 plt.plot(time[IdxPlot], v_0[IdxPlot], label='rotor')
 plt.plot(time[IdxPlot], v_0L[IdxPlot], label='lidar')
+plt.plot(time[IdxPlot], v_FF[IdxPlot], label='lidar (control)')
 plt.grid()
 plt.ylabel('[m/s]')
 plt.legend(loc='best')

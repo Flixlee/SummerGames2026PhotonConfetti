@@ -1,0 +1,247 @@
+% ---------------------------------------------------------------------
+% History
+% ---------------------------------------------------------------------
+\def\CurrentVersion{v1.13mod}
+% v1.13mod 	DS on 04-Jul-2023: modification for Thesis Template: remove final page, SWE logo, background_WindFarm in \DeclareStringOption 
+% v1.13 	DS on 24-Jul-2022: add booktabs
+% v1.12 	DS on 23-Mar-2022: add subtitle feature
+% v1.11 	DS on 03-Feb-2022: add tabu
+% v1.10 	DS on 08-Feb-2022: add \CiteText
+% v1.9  	DS on 12-Jun-2021: add compilation time and version
+% v1.8  	DS on 30-May-2021: add warning related stuff
+% v1.7  	DS on 24-Apr-2021: add animate
+% v1.6  	DS on 11-Apr-2021: update footline, remove doi
+% v1.5  	DS on 26-Mar-2021: change from bibtex to biblatex with biber
+% v1.4  	DS on 16-Mar-2021: add cancel and Tikz Details
+% v1.3  	DS on 09-Mar-2021: add doi and SWE logo
+% v1.2  	DS on 22-Aug-2020: Smaller adjustments for Advanced Engineering Lecture
+% v1.1  	DS on 22-Sep-2018: Disclaimer Adjustments, background folder
+% v1.0  	DS on 09-Oct-2018
+% ---------------------------------------------------------------------
+% Options
+% ---------------------------------------------------------------------
+% to use options in key-value format for their package options
+\RequirePackage{kvoptions} 
+\SetupKeyvalOptions{
+	family = WFS,
+	prefix = WFS@
+}
+\DeclareStringOption[WETI-Style/core/]{corePath}
+\DeclareStringOption[WETI-Style/background/background_WindFarm]{TitleBackgroundPicture}
+\ExecuteOptions{%
+	blackLinks=true,
+	compactLayout=false,
+	draft=false,
+	logo=true,
+	corePath=./core/,
+	deliverable=false}
+\ProcessKeyvalOptions{WFS}
+% ---------------------------------------------------------------------
+% Input
+% ---------------------------------------------------------------------
+\input{\WFS@corePath/putAtDefines}
+% ---------------------------------------------------------------------
+% Beamer Style
+% ---------------------------------------------------------------------
+% Theme
+\usetheme{Dresden}
+\usefonttheme[onlymath]{serif}
+% Colors
+\definecolor{MyBG}{RGB}{0, 81, 158}
+\definecolor{MyLightBG}{RGB}{116, 225, 249}
+\definecolor{MyBlockBG}{RGB}{250, 250, 250}
+\definecolor{FUASpurple}{RGB}{103, 65, 140}
+\definecolor{FUASred}{RGB}{215, 29, 36}
+% templates
+\setbeamertemplate{blocks}[rounded][shadow=true]
+\setbeamertemplate{background canvas}[vertical shading][bottom=white,top=structure.fg!0]
+\setbeamertemplate{sidebar canvas left}[horizontal shading][left=white!40,right=black]
+\setbeamertemplate{bibliography item}{\insertbiblabel} % Removes icon in bibliography
+\setbeamertemplate{section in toc}[sections numbered]
+% font
+\setbeamerfont{institute}{size=\fontsize{7pt}{8pt}}
+\setbeamerfont{date}{size=\fontsize{7pt}{8pt}}
+% color
+\setbeamercolor{author in head/foot}{parent=palette tertiary,fg=white!10, bg=MyBG}
+\setbeamercolor{section in head/foot}{parent=palette tertiary,fg=white, bg=MyBG}
+\setbeamercolor{frametitle}{fg=MyBG}
+\setbeamercolor{title}{fg=white}
+\setbeamercolor{block title}{bg=MyBlockBG,fg=MyBG}
+\setbeamercolor{block body}{bg=MyBlockBG}
+\setbeamercolor{block title alerted}{bg=MyBlockBG,fg=MyBG}
+\setbeamercolor{block body alerted}{bg=MyBlockBG}
+\AtBeginEnvironment{block}{\setbeamercolor{itemize item}{fg=MyBG}}
+\AtBeginEnvironment{block}{\setbeamercolor{enumerate item}{fg=MyBG}}
+\AtBeginEnvironment{alertblock}{\setbeamercolor{itemize item}{fg=FUASred}}
+\AtBeginEnvironment{exampleblock}{\setbeamercolor{itemize item}{fg=block title example.fg}}
+\setbeamercolor{section in toc}{fg=MyBG}
+\setbeamercolor{section number projected}{bg=MyBG, fg=MyBlockBG}
+% ---------------------------------------------------------------------
+% Titel page
+% ---------------------------------------------------------------------
+\renewcommand{\maketitle}{
+	\usebackgroundtemplate{
+  		\parbox[c][\paperheight][c]{\paperwidth}{\centering\includegraphics[width=\paperwidth]{\WFS@TitleBackgroundPicture}}% https://tex.stackexchange.com/questions/26458/beamer-background-image-centered
+		}
+	\begin{frame}[plain]
+	\titlepage{
+		\PutAt<1->[5cm]{(10.6cm,8.5cm)}{\includegraphics[height=1.3cm]{\WFS@corePath/WETI}}%	
+		\PutAt<1->[5cm]{(2.5cm,8.5cm)}{\includegraphics[height=1.3cm]{\WFS@corePath/FUAS}}%				
+	}    
+	\end{frame}
+	\usebackgroundtemplate{} % no Background
+}
+% Title etc.
+\defbeamertemplate*{title page}{customized}[1][]{
+\begin{textblock*}{12cm}(9.4cm,2.3cm)
+\begin{tikzpicture}
+	\node[draw=FUASpurple,fill=FUASpurple,text width=5.5cm,align=center,opacity=0.8,line width=0] {
+		\par\vspace{0.2cm}
+	  	{\usebeamerfont{title}		\usebeamercolor[fg]{title}	 	\inserttitle		\par\vspace{0.4cm}}
+	  	{\usebeamerfont{institute}	\usebeamercolor[fg]{title}		\insertauthor		\par\vspace{0.2cm}}
+	  	{\usebeamerfont{date}	 	\usebeamercolor[fg]{title} 		\insertdate 		\par\vspace{0.2cm}}
+	  	{\usebeamerfont{date}	 	\usebeamercolor[fg]{title} 		\insertsubtitle		\par\vspace{0.2cm}}
+		};
+\end{tikzpicture}
+\end{textblock*}
+}
+% ---------------------------------------------------------------------
+% new environments, setlength etc.
+% ---------------------------------------------------------------------
+\newenvironment<>{varblock}[2][.9\textwidth]{%
+	\setlength{\textwidth}{#1}
+	\begin{actionenv}#3%
+		\def\insertblocktitle{#2}%
+		\par%
+		\usebeamertemplate{block begin}}
+	{\par%
+		\usebeamertemplate{block end}%
+\end{actionenv}}
+%http://tex.stackexchange.com/questions/87249/adjust-vertical-space-before-enumerated-list-in-beamer
+\setlength{\leftmargini}{0.5cm} % Abstand item vom linken rand 0 = wie normaler text
+% ---------------------------------------------------------------------
+% headline, footline, frametitle
+% ---------------------------------------------------------------------
+\setbeamertemplate{headline}{\vspace*{.5cm}}
+\setbeamertemplate{footline}{
+	\vbox{
+		\pgfsetfillopacity{1}
+		\begin{beamercolorbox}[wd=\paperwidth,ht=0.45cm,dp=2ex]{author in head/foot}
+			\usebeamerfont{author in head/foot}
+			\begin{tabularx}{\textwidth}{lXp{0.8cm}<{\raggedleft\arraybackslash}}
+				\begin{tabular}[t]{@{}l@{}}\insertshortauthor ~~|~~ \insertshortinstitute\\ \insertshorttitle \end{tabular} & \insertnavigation{\linewidth} & 
+				\insertframenumber/\inserttotalframenumber
+			\end{tabularx}	
+		\end{beamercolorbox}%
+	}
+	\vspace*{.3cm}
+}
+
+\setbeamertemplate{frametitle}
+{\leavevmode\hspace{0.5cm}{\usebeamerfont{header_font_subsection}{\bf\insertframetitle}}
+%\PutAt<1->{(13.6cm,0.4cm)}{\includegraphics[height=1.3cm]{\WFS@corePath/FUAS}}%
+%\PutAt<1->{(0cm,1.3cm)}{\textcolor{FUASpurple}{\rule{12.5cm}{1.5pt}}}
+}
+% ---------------------------------------------------------------------
+% Navigation
+% ---------------------------------------------------------------------
+\setbeamertemplate{navigation symbols}{}
+%---------------------------------------------------------------------------------------------------------
+%http://tex.stackexchange.com/questions/49241/navigation-bullets-very-small-in-custom-beamer-outer-theme
+\newdimen\beamer@miniframeradius
+\beamer@miniframeradius=0.05cm
+\define@key{beamer@margin}{mini frame radius}{\beamer@miniframeradius=#1\relax}
+\setbeamertemplate{mini frame}
+{%
+	\begin{pgfpicture}{0.00cm}{0.00cm}{2\beamer@miniframeradius}{2\beamer@miniframeradius}
+		\includegraphics[width=0.1cm]{\WFS@corePath/MiniFrameWETI.pdf}
+	\end{pgfpicture}%
+}
+%---------------------------------------------------------------------------------------------------------
+% Remove some pages from the navigation
+%http://tex.stackexchange.com/questions/37127/how-to-remove-some-pages-from-the-navigation-bullets-in-beamer	
+\let\beamer@writeslidentry@miniframeson=\beamer@writeslidentry
+\def\beamer@writeslidentry@miniframesoff{%
+	\expandafter\beamer@ifempty\expandafter{\beamer@framestartpage}{}% does not happen normally
+	{%else
+		% removed \addtocontents commands
+		\clearpage\beamer@notesactions%
+	}
+}
+\newcommand*{\miniframeson}{\let\beamer@writeslidentry=\beamer@writeslidentry@miniframeson}
+\newcommand*{\miniframesoff}{\let\beamer@writeslidentry=\beamer@writeslidentry@miniframesoff}
+\beamer@compresstrue
+%---------------------------------------------------------------------------------------------------------
+% ---------------------------------------------------------------------
+% Other packages
+% ---------------------------------------------------------------------
+% uniformly use international system of units
+\RequirePackage{siunitx}
+% Tikz
+\RequirePackage{tikz}
+\usetikzlibrary{shapes,positioning,tikzmark,arrows,math,fit,calc}
+\RequirePackage{tikz-3dplot}
+\RequirePackage{pgfplots}
+%https://tex.stackexchange.com/questions/81899/what-does-running-in-backwards-compatibility-mode-mean-and-what-should-i-fix-t
+\pgfplotsset{compat=newest,compat/show suggested version=false}
+\tikzstyle{every picture}+=[remember picture] % https://tex.stackexchange.com/questions/56498/tikz-grid-and-remember-picture-overlay
+% set border of slides
+\RequirePackage{geometry}
+\geometry{left=0.5cm,right=0.5cm,bottom=1cm}
+% accept different input encodings
+\RequirePackage[utf8]{inputenc}
+% accept different output encodings
+\RequirePackage[T1]{fontenc}
+% enhanced support for graphics
+\RequirePackage{graphicx}
+\RequirePackage{epstopdf} 
+% mathematical features 
+\RequirePackage{mathtools}
+\RequirePackage{bm}
+% use latin modern font, sans serif
+\RequirePackage{lmodern}
+% placing boxes at absolute positions 
+\RequirePackage[absolute,overlay]{textpos}
+% rotate stuff
+%\RequirePackage{rotating}
+% processes the PostScript graphics with psfrag to add labels within the graphic
+\RequirePackage{pstool}
+\RequirePackage{epstopdf}
+% nice tables
+\RequirePackage{tabularx}
+\RequirePackage{multirow}
+\RequirePackage{tabu}
+\RequirePackage{booktabs}
+% cancel out stuff
+\RequirePackage{cancel}
+% animate graphics
+\RequirePackage{animate}
+% current time
+\RequirePackage[short,nodayofweek,level,24hr]{datetime} 
+% justifying
+\RequirePackage{ragged2e} 
+% more bullet point options
+\RequirePackage{pifont}
+% -------------------------------------------------------------
+% Bibliography
+% -------------------------------------------------------------
+% Use author-date style for the bibliography
+\RequirePackage[style=numeric,%
+backend=biber,%
+sorting=none,%
+doi = true,%
+url = true,%
+maxbibnames = 6,%
+giveninits=true,
+]{biblatex}
+% make sure some font is used: https://tex.stackexchange.com/questions/203111/small-caps-font-warning-in-beamer-using-biblatex
+\renewcommand\mkbibacro[1]{{\bibfont\MakeUppercase{#1}}}	
+% ---------------------------------------------------------------------
+% Warnings related stuff
+% ---------------------------------------------------------------------
+% page-group Warning: https://tex.stackexchange.com/questions/76273/multiple-pdfs-with-page-group-included-in-a-single-page-warning
+\pdfsuppresswarningpagegroup=1
+% ---------------------------------------------------------------------
+% Definitions etc.
+% ---------------------------------------------------------------------
+\NewDocumentCommand\CiteText{m}{{\tiny\textcolor{gray}{#1}}}

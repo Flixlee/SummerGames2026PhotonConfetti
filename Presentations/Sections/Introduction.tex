@@ -1,0 +1,29 @@
+%=================================================================================
+\section[Introduction]{Introduction}
+%=================================================================================
+\begin{frame}{Photon Confetti: what a nacelle lidar really delivers}
+	\begin{columns}
+		\column{6.2cm}
+		\includegraphics[width=\linewidth]{Figures/title_photon_confetti_graphic}
+		\column{7.8cm}
+		\begin{block}<1->{Motivation}
+			\begin{itemize}
+				\item 12\,h of real data \cite{SummerGames2026}: 4 beams, 10 range gates (50--200\,m), 4\,Hz
+				\item every beam only once per second, often blocked by the blades\\
+				      \footnotesize (about 26\,\% of the top and 48\,\% of the bottom measurements invalid)
+				\item baseline \texttt{LDP\_v3} \cite{Guo2023a}: one gate, low-pass filter\\
+				      $\Rightarrow$ SDES $= 1.738\,D$
+			\end{itemize}
+		\end{block}
+	\end{columns}
+	\begin{alertblock}<1->{Main questions}
+		\begin{itemize}
+			\item How much preview quality can be gained from \emph{all} distances and beams?
+			\item How must the signal be shaped to be useful for feedforward control?
+		\end{itemize}
+	\end{alertblock}
+\end{frame}
+%---------------------------------------------------------------------------------
+\begin{frame}{Contents}
+	\tableofcontents
+\end{frame}

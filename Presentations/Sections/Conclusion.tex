@@ -1,0 +1,49 @@
+%=================================================================================
+\section[Conclusion]{Conclusion and Outlook}\label{sec:CNO}
+%=================================================================================
+\begin{frame}{What we learned along the way}
+	\begin{columns}[T]
+		\column{7.0cm}
+		\begin{block}<1->{About the metric}
+			\begin{itemize}
+				\item the SDES penalizes late signals (finite averaging windows)
+			\end{itemize}
+		\end{block}
+		\begin{block}<1->{About control}
+			\begin{itemize}
+				\item punctuality matters more than smoothness
+				\item filtering needs preview to pay for its delay
+			\end{itemize}
+		\end{block}
+		\column{7.0cm}
+		\begin{block}<1->{About the atmosphere}
+			\begin{itemize}
+				\item turbulent structures are tilted: the top beams see them earlier
+				\item beams measuring at different heights must stay synchronous
+				\item the apparent transport speed is not simply the mean wind speed
+			\end{itemize}
+		\end{block}
+	\end{columns}
+\end{frame}
+%---------------------------------------------------------------------------------
+\begin{frame}{Conclusion and Outlook}
+	\begin{alertblock}<1->{Conclusion}
+		\begin{itemize}
+			\item MD-LDP: all gates, all beams, combined in rotor time
+			\item preview quality: SDES $1.738\,D \rightarrow 1.155\,D$
+			\item load reduction with the simple feedforward: $94.96\,\% \rightarrow 84.49\,\%$, all constraints fulfilled
+			\item one algorithm, two outputs, same interface as the baseline (Python and Matlab)
+		\end{itemize}
+	\end{alertblock}
+	\begin{block}<1->{Outlook}
+		\begin{itemize}
+			\item adaptivity to the atmosphere: turbulence parameters from the lidar itself \cite{Mann1994}
+			\item better level estimate for advanced controllers (operating point dependent induction)
+			\item H$_\infty$ controller using the discipline 2 output (team mate)
+		\end{itemize}
+	\end{block}
+\end{frame}
+%---------------------------------------------------------------------------------
+\begin{frame}{References}
+	\printbibliography[heading=none]
+\end{frame}

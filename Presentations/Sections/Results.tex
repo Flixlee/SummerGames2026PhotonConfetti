@@ -1,0 +1,63 @@
+%=================================================================================
+\section[Results]{Results}
+%=================================================================================
+\begin{frame}{From 1.738\,D to 1.155\,D, step by step}
+	\begin{columns}
+		\column{9.0cm}
+		\includegraphics[width=\linewidth]{Figures/result_steps}
+		\column{5.0cm}
+		\begin{block}<1->{Reading the chart}
+			\begin{itemize}
+				\item each bar adds one building block
+				\item multiple distances: the big step
+				\item rotor time and transport speed: the refinements
+			\end{itemize}
+		\end{block}
+	\end{columns}
+\end{frame}
+%---------------------------------------------------------------------------------
+\begin{frame}{Discipline 1: preview quality}
+	\begin{columns}
+		\column{8.5cm}
+		\includegraphics[width=\linewidth]{Figures/result_coherence}
+		\column{5.5cm}
+		\begin{alertblock}<1->{Smallest detectable eddy size}
+			\begin{tabular}{@{}lr@{}}
+				\texttt{LDP\_v3}         & $1.738\,D$ \\
+				MD-LDP, output 1         & $\mathbf{1.155\,D}$ \\
+				MD-LDP, output 2         & $1.180\,D$ \\
+			\end{tabular}\\[2mm]
+			$-34\,\%$ compared to the baseline
+		\end{alertblock}
+	\end{columns}
+\end{frame}
+%---------------------------------------------------------------------------------
+\begin{frame}{Discipline 2: load reduction with the simple feedforward}
+	\begin{columns}
+		\column{8.0cm}
+		\includegraphics[width=\linewidth]{Figures/result_punctuality}
+		\column{6.0cm}
+		\begin{alertblock}<1->{Tower DEL compared to feedback only}
+			\begin{tabular}{lr}
+				\texttt{LDP\_v3}       & $94.96\,\%$ \\
+				MD-LDP (discipline 2)  & $\mathbf{84.49\,\%}$ \\
+			\end{tabular}\\[2mm]
+			all constraints fulfilled\\
+			\footnotesize (energy, max.\ speed, power quality, pitch travel)
+		\end{alertblock}
+		\begin{block}<1->{Same controller}
+			Only the lidar signal is changed; the feedforward controller is the one of the example.
+		\end{block}
+	\end{columns}
+\end{frame}
+%---------------------------------------------------------------------------------
+\begin{frame}{How the signals look}
+	\centering
+	\includegraphics[width=0.95\linewidth]{Figures/result_timeseries}
+	\begin{block}<1->{Observations}
+		\begin{itemize}
+			\item the baseline lags behind the rotor wind by several seconds, both MD-LDP outputs follow the gust
+			\item the remaining offset in the level does not matter for the SDES and the feedforward
+		\end{itemize}
+	\end{block}
+\end{frame}

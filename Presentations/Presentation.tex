@@ -1,0 +1,27 @@
+% !BIB TS-program = biber
+% !TEX spellcheck = en_US
+%---------------------------------------------------------------------------------
+% Template based on Lecture "Controller Design for Wind Turbines and Wind Farms" by David Schlipf
+%---------------------------------------------------------------------------------
+%\documentclass[aspectratio=1610,handout]{beamer} % without overlays
+\documentclass[aspectratio=1610]{beamer}
+%\setbeamertemplate{background}[grid][step=1cm] % grid can be helpful for \PutAt
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\title{How to Achieve a Wind Preview Quality with a Smallest Detectable Eddy Size Below 1.2 D}
+\institute[WETI]{Wind Energy Technology Institute}
+\author[Team Photon-Confetti]{Team Photon-Confetti}
+\date{16.10.2026}
+\subtitle{Summer Games 2026 - Ultra Marathon}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\usepackage[corePath=WETI-Style/core/,
+TitleBackgroundPicture=Figures/title_photon_confetti_background.pdf]
+{WETI-Style/WETI-Presentation}%v1.13mod
+\bibliography{WETI-Style/PublicationsDavidSchlipf,SummerGames2026Bib.bib}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{document}
+\maketitle
+\input{Sections/Introduction}
+\input{Sections/Algorithm}
+\input{Sections/Results}
+\input{Sections/Conclusion}
+\end{document}

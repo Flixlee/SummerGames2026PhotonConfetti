@@ -1,0 +1,107 @@
+%=================================================================================
+\section[MD-LDP]{Multi-Distance Lidar Data Processing}
+%=================================================================================
+\begin{frame}{The idea in one picture}
+	\centering
+	\includegraphics[width=\linewidth]{Figures/MD_LDP_concept}
+	\vfill
+	\begin{block}<1->{Same interface as \texttt{LDP\_v3}}
+		One call per time step, only the lidar signals (line-of-sight speed, valid flag, beam ID) of the current
+		and past time steps, but \emph{all} gates (multi-distance idea \cite{Schlipf2015e}).
+		Two outputs from the same buffer: one for each discipline.
+	\end{block}
+\end{frame}
+%---------------------------------------------------------------------------------
+\begin{frame}{Key idea 1: blade ghost avoidance}
+	\begin{columns}[T]
+		\column{7.0cm}
+		\begin{block}<1->{What goes wrong in the baseline}
+			\begin{itemize}
+				\item mean over the beams that happen to be valid
+				\item when a blade blocks a beam, the \emph{composition} of the mean changes
+			\end{itemize}
+		\end{block}
+		\column{7.0cm}
+		\begin{block}<1->{What we do}
+			\begin{itemize}
+				\item each beam and gate keeps its own last valid information
+				\item a gate is always represented by all 4 beams
+			\end{itemize}
+		\end{block}
+	\end{columns}
+	\begin{alertblock}<1->{Effect}
+		With the baseline settings only this step: SDES $1.738\,D \rightarrow 1.657\,D$
+	\end{alertblock}
+\end{frame}
+%---------------------------------------------------------------------------------
+\begin{frame}{Key idea 2: think in rotor time}
+	\begin{columns}[T]
+		\column{7.0cm}
+		\begin{block}<1->{Every measurement gets its arrival time}
+			\begin{itemize}
+				\item the air measured at a gate reaches the rotor seconds later
+				\item each measurement is stored with: \emph{when} it will arrive at the rotor
+				\item the output is read from this buffer at the desired rotor time
+			\end{itemize}
+		\end{block}
+		\column{7.0cm}
+		\begin{block}<1->{The preview pays twice}
+			\begin{itemize}
+				\item the \emph{next} measurement of a beam is usually taken before the current one arrives
+				\item  interpolation instead of holding
+				\item all gates aligned to the same rotor time can be combined
+			\end{itemize}
+		\end{block}
+	\end{columns}
+	\begin{alertblock}<1->{Largest single gain}
+		Combining the aligned distances: SDES $1.590\,D \rightarrow 1.270\,D$ (more than all other steps together)
+	\end{alertblock}
+\end{frame}
+%---------------------------------------------------------------------------------
+\begin{frame}{Key idea 3: which speed transports the turbulence?}
+	\begin{columns}[T]
+		\column{7.0cm}
+		\begin{block}<1->{Space instead of time}
+			\begin{itemize}
+				\item a long time average at a fixed point mostly contains air that has \emph{already passed}
+				\item the measured volume upstream contains the air that is \emph{about to arrive}
+			\end{itemize}
+		\end{block}
+		\column{7.0cm}
+		\begin{block}<1->{Physics on top}
+			\begin{itemize}
+				\item induction zone in front of the rotor
+				\item height profile of the wind
+				\item small effects on the SDES, but consistent and cheap
+			\end{itemize}
+		\end{block}
+	\end{columns}
+	\begin{alertblock}<1->{Effect}
+		Transport speed from space instead of a time filter: SDES $1.222\,D \rightarrow 1.157\,D$
+	\end{alertblock}
+\end{frame}
+%---------------------------------------------------------------------------------
+\begin{frame}{Key idea 4: one buffer, two outputs}
+	\begin{columns}[T]
+		\column{7.0cm}
+		\begin{block}<1->{Discipline 1: preview quality}
+			\begin{itemize}
+				\item read at the current rotor time
+				\item no low-pass filter
+				\item the SDES rewards coherent content
+			\end{itemize}
+		\end{block}
+		\column{7.0cm}
+		\begin{block}<1->{Discipline 2: feedforward control}
+			\begin{itemize}
+				\item read a few seconds \emph{ahead} of the rotor
+				\item adaptive low-pass filter: only what the turbine can follow
+				\item the preview compensates the delay of the filter
+			\end{itemize}
+		\end{block}
+	\end{columns}
+	\begin{alertblock}<1->{Lesson learned}
+		A filtered signal that arrives too late is worse than no lidar at all:
+		late feedforward fights the feedback controller and increases the pitch activity.
+	\end{alertblock}
+\end{frame}
