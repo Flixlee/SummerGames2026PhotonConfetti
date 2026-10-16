@@ -14,20 +14,23 @@
 %---------------------------------------------------------------------------------
 \begin{frame}{Key idea 1: blade ghost avoidance}
 	\begin{columns}[T]
-		\column{7.0cm}
+		\column{7.6cm}
 		\begin{block}<1->{What goes wrong in the baseline}
 			\begin{itemize}
 				\item mean over the beams that happen to be valid
 				\item when a blade blocks a beam, the \emph{composition} of the mean changes
 			\end{itemize}
 		\end{block}
-		\column{7.0cm}
-		\begin{block}<1->{What we do}
+		\begin{block}<1->{What we do: blade ghost avoidance \cite{Schlipf2021c}}
 			\begin{itemize}
 				\item each beam and gate keeps its own last valid information
 				\item a gate is always represented by all 4 beams
 			\end{itemize}
 		\end{block}
+		\column{6.4cm}
+		\centering
+		\includegraphics[height=4.8cm]{Figures/Schlipf2021cSpectra}\\
+		{\tiny spectra of the rotor-effective wind speed, from \cite{Schlipf2021c}}
 	\end{columns}
 	\begin{alertblock}<1->{Effect}
 		With the baseline settings only this step: SDES $1.738\,D \rightarrow 1.657\,D$
@@ -64,7 +67,7 @@
 		\begin{block}<1->{Space instead of time}
 			\begin{itemize}
 				\item a long time average at a fixed point mostly contains air that has \emph{already passed}
-				\item the measured volume upstream contains the air that is \emph{about to arrive}
+				\item the measured volume upstream contains the air that is \emph{about to arrive} \cite{Schlipf2024d}
 			\end{itemize}
 		\end{block}
 		\column{7.0cm}
